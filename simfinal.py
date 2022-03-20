@@ -31,7 +31,6 @@ def initPoints(cap, warped, pts):
     
     height, width = frame.shape[:2]
 
-    #cv2.rectangle(frame, (width,0), (width-90,height), (255,255,255), -1)
     cv2.imshow('frame', frame)
     
     
@@ -63,13 +62,10 @@ def initPoints(cap, warped, pts):
     return frame, pts
 
 def checkIfRed(points, image, pos1, pos2):
-    #print (pos1)
-    #print (pos2)
     
     imageCopy = image
     
     cv2.imshow('image', image)
-    
     
     mask = np.zeros(image.shape[:2], dtype='uint8')
     
@@ -78,8 +74,6 @@ def checkIfRed(points, image, pos1, pos2):
 
     masked = cv2.bitwise_and(imageCopy, imageCopy, mask=mask)
     
-    #cv2.imshow("masked", masked)
-
     lower_red = np.array([0, 50, 0])
     upper_red = np.array([100, 255, 100])
     
@@ -87,17 +81,9 @@ def checkIfRed(points, image, pos1, pos2):
     redMaskApplied = cv2.bitwise_and(masked, masked, mask=redMask)
     
     redMaskApplied = cv2.GaussianBlur(redMaskApplied, (5, 5), 0)
-    
-    #cv2.imshow("redMask", redMaskApplied)
-
 
     threshMask = cv2.cvtColor(redMaskApplied, cv2.COLOR_BGR2GRAY)
     final = cv2.threshold(threshMask, 1, 255, cv2.THRESH_BINARY)[1]
-
-    #cv2.imshow("final", final)
-    #cv2.waitKey(0)
-    #cv2.destroyAllWindows();
-
     
     cntsMask = cv2.findContours(final, cv2.RETR_EXTERNAL,
     cv2.CHAIN_APPROX_SIMPLE)
@@ -136,9 +122,8 @@ def checkPlayerMove(frame, points, boardRead):
                     boardRead.append(checkIfRed(points, frame, i, j))
         return boardRead
     
-#END OF CV STUFF FOR A BIT
     
-#AI CV MIX FUNC
+#AI TO CV CONVERSION FUNCTION
     
 def cv2ai(aiList, cvList):
     for i in range (0, 6):
@@ -148,8 +133,9 @@ def cv2ai(aiList, cvList):
                 aiList[i][j] = 1
     print (aiList)
     return aiList
-                
-                
+                     
+#A FEW MORE CV FUNCTIONS
+         
 def order_points(pts):
     
     rect = np.zeros((4, 2), dtype="float32")
@@ -181,9 +167,6 @@ def four_point_transform(img, pts):
     
     M  = cv2.getPerspectiveTransform(rect, dst)
     warped = cv2.warpPerspective(img, M, (maxWidth, maxHeight))
-    
-    #print("width ", warped.shape[1])
-    #print("height ", warped.shape[0])
     
     return warped
 
@@ -242,7 +225,9 @@ def findRedPoints(image):
     cv2.imshow("image", image)
 
     return points
-  
+
+#CV TO AI FUNCTIONS
+
 def cvToMove(tMatrix, x, y):
     xyMatrix = np.array([[x], [y], [1]])
     moveMatrix = tMatrix@xyMatrix
@@ -274,7 +259,7 @@ def drawLine(tMatrix, x1, y1, x2, y2, ppl): #points per line
     ser.write(b'U\n')
 
     
-#NOW JUST AI
+#AI FUNCTIONS
   
 def checkForWin(lastMove, position):
     for i in range(0, 6):
@@ -498,12 +483,11 @@ calX3 = 150
 calY3 = 70
 
 
-ser = serial.Serial('/dev/ttyACM0', 9600, timeout=5) #ajdkfljasldkfjal;skdakl;sdkl;asdf;klasdf
+ser = serial.Serial('/dev/ttyACM0', 9600, timeout=5) 
 time.sleep(2);
-ser.write(b'K\n'); #kill arduino
+ser.write(b'K\n'); #restart arduino
 time.sleep(2);
 #calibration time
-#calPos1 = "X" + str(calX1) + ",Y" + str(calY1) + "\n"
 
 calPos1 = "X135,Y-20\n"
 calPos1b = bytes(calPos1, 'utf-8')
@@ -577,7 +561,7 @@ ser.write(b'U\n');
 time.sleep(.5)
 
 
-ser.write(b'X0,Y-179.65\n') #out of da wai
+ser.write(b'X0,Y-179.65\n') #move out of the way
 time.sleep(2)
 
 for i in range(0, 6):
@@ -588,9 +572,6 @@ cv2.waitKey(0)
 
 cv2.destroyAllWindows();
 
-#if len(points) != 3:
-#    print("error: not all points found")
-#    exit()
 cvp1 = points[0]
 cvp2 = points[1]
 cvp3 = points[2]
@@ -659,18 +640,7 @@ while cap.isOpened():
     hsv[:,:,2] = hsv[:,:,2]*2
     hsv[:,:,2] = np.clip(hsv[:,:,2], 0, 255)
     
-    image = cv2.cvtColor(hsv.astype('uint8'), cv2.COLOR_HSV2BGR)
-    
-    # delete this after testing is done:
-    '''while True:
-        coordxtest = int(input("choose an x pixel"))
-        coordytest = int(input("choose a y pixel"))
-        cvToMove(transformationMatrix, coordxtest, coordytest)
-        time.sleep(5)
-        ser.write(b'X0,Y-179.65\n') #out of da wai
-        time.sleep(3)'''
-
-        
+    image = cv2.cvtColor(hsv.astype('uint8'), cv2.COLOR_HSV2BGR)     
     
     playerMove(lines, player, warped, pts)
     
