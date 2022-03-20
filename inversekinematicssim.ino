@@ -42,7 +42,6 @@ void loop() {
   if (Serial.available() > 0) serialEvent();
 
 
-
   if (stringComplete) {
 
     int yInd = inputString.indexOf("Y");   //put in x and y vals
@@ -79,15 +78,6 @@ void loop() {
     stringComplete = false;
 
   }
- 
-
- 
- 
-
-
-
- 
- 
 }
 
 void serialEvent() {
@@ -144,16 +134,3 @@ void setNewPos(int oldStep1, int oldStep2, int newStep1, int newStep2, int numSt
   stepper1.step(remainder1);
   stepper2.step(remainder2);
 }
-
-
-
-/*for (int i = 0; i < 40; i++) {
-    stepper1.step(2);
-    stepper2.step(1);
-  }
-  delay(500);
-  for (int i = 0; i < 40; i++) {
-    stepper1.step(-2);
-    stepper2.step(-1);
-  }
-  delay(500);*/
