@@ -182,7 +182,7 @@ def findRedPoints(image):
             else:
                 otherThing = 255
         
-    cv2.imshow("sss", image)
+    cv2.imshow("image", image)
     
     hsv = cv2.cvtColor(imageCopy, cv2.COLOR_BGR2HSV).astype("float32")
 
